@@ -2,15 +2,13 @@ import sqlite3
 import pandas as pd
 from pandas import DataFrame
 
-conn = sqlite3.connect('./StudentDB.db')
+conn = sqlite3.connect('StudentDB.db')
 mycursor = conn.cursor()
 
+def dataIngestion():
+    print("Checking")
 
-    #mycursor.execute('SELECT * FROM Students')
 
-    #myrecords = mycursor.fetchall()
-
-    #print(myrecords)
 
 def options():
     while True:
@@ -22,7 +20,7 @@ def options():
         print("4. Delete a Student")
         print("5. Search/Display students by Major, GPA, City, State or Advisor.")
         print("6. Exit Program")
-        choice = input("Enter the number of the option you would like to excecute: ")
+        choice = input("Enter the number of the option you would like to execute: ")
         if choice == "1":
             print("\n")
             displayStudents()
@@ -51,10 +49,10 @@ def options():
 
 def displayStudents():
     print("Made it")
-    #mycursor.excecute('SELECT * Major FROM Students')
-    #records = mycursor.fetchall())
-    #df = pd.DataFrame(records)
-    #print(df)
+    mycursor.execute('SELECT * FROM Student')
+    records = mycursor.fetchall()
+    df = pd.DataFrame(records)
+    print(df)
 
 def addStudent():
     nFirstName = input("First Name of the Student: ")
@@ -84,6 +82,7 @@ def addStudent():
             print("Try again with only digits: ")
 
     #mycursor.excecute('INSERT INTO Students VALUES (?,?,?,?,?,?,?,?,?,?,?)', (nFirstName,nLastName,nGPA,nMajor,nFacultyAdvisor,nAddress,nCity,nState,nZipCode,nPhoneNumber,0))
+    #conn.commit()
     print("Student Sucsesfully Added.")
 
 def updateStudent():
@@ -96,10 +95,12 @@ def updateStudent():
     if choice == "1":
         nMajor = input("Students New Major: ")
         #update dataset
+        #conn.commit()
         print("Information Succesfully Updated")
     elif choice == "2":
         nAdvisor = input("Student New Advisor: ")
         # update dataset
+        # conn.commit()
         print("Information Succesfully Updated")
     elif choice == "3":
         while True:
@@ -108,6 +109,7 @@ def updateStudent():
                 break
             except ValueError:
                 print("Try again with only digits: ")
+        # conn.commit()
         #update dataset
         print("Information Succesfully Updated")
     else:
@@ -124,6 +126,7 @@ def deleteStudent():
     # else:
         #set Isdelete to 1
         # break
+    # conn.commit()
     print("Student Succesfully Deleted")
 
 def searchStudent():
