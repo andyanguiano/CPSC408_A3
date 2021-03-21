@@ -4,6 +4,7 @@ from pandas import DataFrame
 
 conn = sqlite3.connect('StudentDB.db')
 mycursor = conn.cursor()
+pd.set_option("display.max_rows", None, "display.max_columns", None, "display.width", None)
 
 def dataIngestion():
     with open("students.csv") as inputFile:
@@ -59,7 +60,6 @@ def options():
 def displayStudents():
     mycursor.execute('SELECT * FROM Student')
     records = mycursor.fetchall()
-    pd.set_option("display.max_rows", None, "display.max_columns", None, "display.width", None)
     df = DataFrame(records, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address', 'City', 'State', 'ZipCode', 'MobilePhoneNUmber',  'isDeleted'])
 
     print(df)
@@ -150,19 +150,88 @@ def searchStudent():
     print("2. GPA")
     print("3. City")
     print("4. State")
-    print("5. Advisor")
+    print("5. Faculty Advisor")
     while True:
         choice = input("Which corresponding number would you like to filter by: ")
         if choice == "1":
-            #mycursor.excecute('SELECT DISTINCT Major FROM Student')
-            #print(mycursor.fetchall())
-            filterChoice = input("Major would you like to see: ")
-            #mycursor.excecute('SELECT * FROM Student WHERE Major = ?', (filterChoice))
-            #output = mycursor.fetchall()
-            #if output == []:
-                #print("Invalid Input. Please Try Again.")
-                #searchStudent()
-           # else:
-                #print(output)
-                #break
+            mycursor.execute('SELECT DISTINCT Major FROM Student')
+            output = mycursor.fetchall()
+
+            df = DataFrame(output, columns=['Majors'])
+            print(df)
+            filterChoice = input("Major you would like to see: ")
+            mycursor.execute('SELECT * FROM Student WHERE Major = ?', (filterChoice,))
+            output = mycursor.fetchall()
+            if output == []:
+                print("Invalid Input. Please Try Again.")
+                searchStudent()
+                break
+            else:
+                df = DataFrame(output, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address','City', 'State', 'ZipCode', 'MobilePhoneNUmber', 'isDeleted'])
+                print(df)
+                break
+        elif choice == "2":
+            filterChoice = input("GPA you would like to see: ")
+            mycursor.execute('SELECT * FROM Student WHERE GPA = ?', (filterChoice,))
+            output = mycursor.fetchall()
+            if output == []:
+                print("Invalid Input. Please Try Again.")
+                searchStudent()
+                break
+            else:
+                df = DataFrame(output, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address','City', 'State', 'ZipCode', 'MobilePhoneNUmber', 'isDeleted'])
+                print(df)
+                break
+        elif choice == "3":
+            mycursor.execute('SELECT DISTINCT City FROM Student')
+            output = mycursor.fetchall()
+            df = DataFrame(output, columns=['Cities'])
+            print(df)
+            filterChoice = input("City you would like to see: ")
+            mycursor.execute('SELECT * FROM Student WHERE City = ?', (filterChoice,))
+            output = mycursor.fetchall()
+            if output == []:
+                print("Invalid Input. Please Try Again.")
+                searchStudent()
+                break
+            else:
+                df = DataFrame(output, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address','City', 'State', 'ZipCode', 'MobilePhoneNUmber', 'isDeleted'])
+                print(df)
+                break
+        elif choice == "4":
+            mycursor.execute('SELECT DISTINCT State FROM Student')
+            output = mycursor.fetchall()
+            df = DataFrame(output, columns=['States'])
+            print(df)
+            filterChoice = input("State you would like to see: ")
+            mycursor.execute('SELECT * FROM Student WHERE State = ?', (filterChoice,))
+            output = mycursor.fetchall()
+            if output == []:
+                print("Invalid Input. Please Try Again.")
+                searchStudent()
+                break
+            else:
+                df = DataFrame(output, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address','City', 'State', 'ZipCode', 'MobilePhoneNUmber', 'isDeleted'])
+                print(df)
+                break
+        elif choice == "5":
+            mycursor.execute('SELECT DISTINCT FacultyAdvisor FROM Student')
+            output = mycursor.fetchall()
+            df = DataFrame(output, columns=['Advisors'])
+            print(df)
+            filterChoice = input("Faculty Advisor you would like to see: ")
+            mycursor.execute('SELECT * FROM Student WHERE FacultyAdvisor = ?', (filterChoice,))
+            output = mycursor.fetchall()
+            if output == []:
+                print("Invalid Input. Please Try Again.")
+                searchStudent()
+                break
+            else:
+                df = DataFrame(output, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address','City', 'State', 'ZipCode', 'MobilePhoneNUmber', 'isDeleted'])
+                print(df)
+                break
+        else:
+            print("Invalid Input. Please Try Again.")
+            searchStudent()
+            break
 
