@@ -6,9 +6,16 @@ conn = sqlite3.connect('StudentDB.db')
 mycursor = conn.cursor()
 
 def dataIngestion():
-    print("Checking")
-
-
+    with open("students.csv") as inputFile:
+        title = 0
+        for line in inputFile:
+            if title == 0:
+                title += 1
+                continue
+            else:
+                mycursor.execute('INSERT INTO Student(FirstName,LastName,Address,City,State,ZipCode,MobilePhoneNumber,Major,GPA) VALUES(?,?,?,?,?,?,?,?,?)',line.split(","))
+                conn.commit()
+                title += 1
 
 def options():
     while True:
@@ -39,6 +46,8 @@ def options():
         elif choice == "6":
             print("\n")
             print("Exiting")
+            mycursor.execute('DELETE FROM Student')
+            conn.commit()
             break
         else:
             print("\n")
@@ -48,10 +57,11 @@ def options():
 
 
 def displayStudents():
-    print("Made it")
     mycursor.execute('SELECT * FROM Student')
     records = mycursor.fetchall()
-    df = pd.DataFrame(records)
+    pd.set_option("display.max_rows", None, "display.max_columns", None, "display.width", None)
+    df = DataFrame(records, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address', 'City', 'State', 'ZipCode', 'MobilePhoneNUmber',  'isDeleted'])
+
     print(df)
 
 def addStudent():
@@ -76,58 +86,63 @@ def addStudent():
             print("Try again with 5 digits: ")
     while True:
         try:
-            nPhoneNumber = int(input("Mobile Phone Number: "))
+            nPhoneNumber = input("Mobile Phone Number: ")
             break
         except ValueError:
             print("Try again with only digits: ")
-
-    #mycursor.excecute('INSERT INTO Students VALUES (?,?,?,?,?,?,?,?,?,?,?)', (nFirstName,nLastName,nGPA,nMajor,nFacultyAdvisor,nAddress,nCity,nState,nZipCode,nPhoneNumber,0))
-    #conn.commit()
-    print("Student Sucsesfully Added.")
+    #fix this
+    mycursor.execute('INSERT INTO Student VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', (111,nFirstName,nLastName,nGPA,nMajor,nFacultyAdvisor,nAddress,nCity,nState,nZipCode,nPhoneNumber,0))
+    conn.commit()
+    print("Student Successfully Added.")
 
 def updateStudent():
     nSID = input("ID of the student you would like to update: ")
-    print("The following are available to update:")
-    print("1. Major")
-    print("2. Advisor")
-    print("3. Mobile Number")
-    choice = input("Which corresponding number would you like to update:")
-    if choice == "1":
-        nMajor = input("Students New Major: ")
-        #update dataset
-        #conn.commit()
-        print("Information Succesfully Updated")
-    elif choice == "2":
-        nAdvisor = input("Student New Advisor: ")
-        # update dataset
-        # conn.commit()
-        print("Information Succesfully Updated")
-    elif choice == "3":
-        while True:
-            try:
-                nPhoneNumber = int(input("Students New Mobile Number: "))
-                break
-            except ValueError:
-                print("Try again with only digits: ")
-        # conn.commit()
-        #update dataset
-        print("Information Succesfully Updated")
-    else:
-        print("Invalid input. Try Again")
+    mycursor.excecute('SELECT * FROM Student WHERE StudentID = ?', (nSID))
+    output = mycursor.fetchall()
+    if output == []:
+        print("Invalid Input. Please Try Again.")
         updateStudent()
+    else:
+        print("The following are available to update:")
+        print("1. Major")
+        print("2. Advisor")
+        print("3. Mobile Number")
+        choice = input("Which corresponding number would you like to update:")
+        if choice == "1":
+            nMajor = input("Students New Major: ")
+            mycursor.execute('UPDATE Student SET Major = ? WHERE studentID = ?', (nMajor,nSID))
+            conn.commit()
+            print("Information Successfully Updated")
+        elif choice == "2":
+            nAdvisor = input("Student New Advisor: ")
+            mycursor.execute('UPDATE Student SET FacultyAdvisor = ? WHERE studentID = ?', (nAdvisor,nSID))
+            conn.commit()
+            print("Information Successfully Updated")
+        elif choice == "3":
+            while True:
+                try:
+                    nPhoneNumber = input("Students New Mobile Number: ")
+                    break
+                except ValueError:
+                    print("Try again with only digits: ")
+            mycursor.execute('UPDATE Student SET MobilePhoneNumber = ? WHERE studentID = ?', (nPhoneNumber,nSID))
+            conn.commit()
+            print("Information Successfully Updated")
+        else:
+            print("Invalid input. Try Again")
+            updateStudent()
 
 def deleteStudent():
     nSID = input("ID of the student to delete: ")
-    # mycursor.excecute('SELECT * FROM Students WHERE StudentID = ?', (nSID))
-    # output = mycursor.fetchall()
-    # if output == []:
-        # print("Invalid Input. Please Try Again.")
-        #deleteStudent()
-    # else:
-        #set Isdelete to 1
-        # break
-    # conn.commit()
-    print("Student Succesfully Deleted")
+    mycursor.execute('SELECT * FROM Student WHERE StudentID = ?', (nSID))
+    output = mycursor.fetchall()
+    if output == []:
+        print("Invalid Input. Please Try Again.")
+        deleteStudent()
+    else:
+        mycursor.execute('UPDATE Student SET isDeleted = ? WHERE studentID = ?', (1,nSID))
+    conn.commit()
+    print("Student Successfully Deleted")
 
 def searchStudent():
     print("Which below would you like to filter the Students by.")
@@ -139,10 +154,10 @@ def searchStudent():
     while True:
         choice = input("Which corresponding number would you like to filter by: ")
         if choice == "1":
-            #mycursor.excecute('SELECT DISTINCT Major FROM Students')
+            #mycursor.excecute('SELECT DISTINCT Major FROM Student')
             #print(mycursor.fetchall())
             filterChoice = input("Major would you like to see: ")
-            #mycursor.excecute('SELECT * FROM Students WHERE Major = ?', (filterChoice))
+            #mycursor.excecute('SELECT * FROM Student WHERE Major = ?', (filterChoice))
             #output = mycursor.fetchall()
             #if output == []:
                 #print("Invalid Input. Please Try Again.")
