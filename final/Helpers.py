@@ -1,15 +1,22 @@
+#Andy Anguiano
+
 import sqlite3
 import pandas as pd
 from pandas import DataFrame
 
+#connecting to the database
 conn = sqlite3.connect('StudentDB.db')
 mycursor = conn.cursor()
+
+#preferences when using pandas dataframes
 pd.set_option("display.max_rows", None, "display.max_columns", None, "display.width", None)
 
+#getting data from csv and populating table
 def dataIngestion():
     with open("students.csv") as inputFile:
         title = 0
         for line in inputFile:
+            #first row is titles
             if title == 0:
                 title += 1
                 continue
@@ -18,6 +25,7 @@ def dataIngestion():
                 conn.commit()
                 title += 1
 
+#main options for the program
 def options():
     while True:
         print("\n")
@@ -56,17 +64,18 @@ def options():
             print("\n")
             continue
 
-
+#diplays all students information in a pandas dataframe
 def displayStudents():
     mycursor.execute('SELECT * FROM Student')
     records = mycursor.fetchall()
     df = DataFrame(records, columns=['StudentId', 'FirstName', 'LastName', 'GPA', 'Major', 'FacultyAdvisor', 'Address', 'City', 'State', 'ZipCode', 'MobilePhoneNUmber',  'isDeleted'])
-
     print(df)
 
+#adds a student to the table
 def addStudent():
     nFirstName = input("First Name of the Student: ")
     nLastName = input("Last Name of the Student: ")
+    #making sure decimals are in place
     while True:
         try:
             nGPA = float(input("GPA of the Student as decimal: "))
@@ -78,12 +87,14 @@ def addStudent():
     nAddress = input("Address: ")
     nCity = input("City: ")
     nState = input("State: ")
+    #making sure zipcode is correct
     while True:
         try:
             nZipCode = int(input("ZipCode: "))
             break
         except ValueError:
             print("Try again with 5 digits: ")
+    #making sure phone number is correct
     while True:
         try:
             nPhoneNumber = input("Mobile Phone Number: ")
@@ -95,14 +106,17 @@ def addStudent():
     conn.commit()
     print("Student Successfully Added.")
 
+#update a students information
 def updateStudent():
     nSID = input("ID of the student you would like to update: ")
     mycursor.excecute('SELECT * FROM Student WHERE StudentID = ?', (nSID))
     output = mycursor.fetchall()
+    #checking if input is valid
     if output == []:
         print("Invalid Input. Please Try Again.")
         updateStudent()
     else:
+        #updating specific attribute of given student
         print("The following are available to update:")
         print("1. Major")
         print("2. Advisor")
@@ -129,13 +143,16 @@ def updateStudent():
             conn.commit()
             print("Information Successfully Updated")
         else:
+            #recursion function if invalid input
             print("Invalid input. Try Again")
             updateStudent()
 
+#delete a student
 def deleteStudent():
     nSID = input("ID of the student to delete: ")
     mycursor.execute('SELECT * FROM Student WHERE StudentID = ?', (nSID))
     output = mycursor.fetchall()
+    #check if input valid
     if output == []:
         print("Invalid Input. Please Try Again.")
         deleteStudent()
@@ -144,6 +161,7 @@ def deleteStudent():
     conn.commit()
     print("Student Successfully Deleted")
 
+#filter through students
 def searchStudent():
     print("Which below would you like to filter the Students by.")
     print("1. Major")
@@ -154,14 +172,15 @@ def searchStudent():
     while True:
         choice = input("Which corresponding number would you like to filter by: ")
         if choice == "1":
+            #show list of distinct majors
             mycursor.execute('SELECT DISTINCT Major FROM Student')
             output = mycursor.fetchall()
-
             df = DataFrame(output, columns=['Majors'])
             print(df)
             filterChoice = input("Major you would like to see: ")
             mycursor.execute('SELECT * FROM Student WHERE Major = ?', (filterChoice,))
             output = mycursor.fetchall()
+            #check if input valid
             if output == []:
                 print("Invalid Input. Please Try Again.")
                 searchStudent()
@@ -174,6 +193,7 @@ def searchStudent():
             filterChoice = input("GPA you would like to see: ")
             mycursor.execute('SELECT * FROM Student WHERE GPA = ?', (filterChoice,))
             output = mycursor.fetchall()
+            # check if input valid
             if output == []:
                 print("Invalid Input. Please Try Again.")
                 searchStudent()
@@ -183,6 +203,7 @@ def searchStudent():
                 print(df)
                 break
         elif choice == "3":
+            # show list of distinct cities
             mycursor.execute('SELECT DISTINCT City FROM Student')
             output = mycursor.fetchall()
             df = DataFrame(output, columns=['Cities'])
@@ -190,6 +211,7 @@ def searchStudent():
             filterChoice = input("City you would like to see: ")
             mycursor.execute('SELECT * FROM Student WHERE City = ?', (filterChoice,))
             output = mycursor.fetchall()
+            # check if input valid
             if output == []:
                 print("Invalid Input. Please Try Again.")
                 searchStudent()
@@ -199,6 +221,7 @@ def searchStudent():
                 print(df)
                 break
         elif choice == "4":
+            # show list of distinct states
             mycursor.execute('SELECT DISTINCT State FROM Student')
             output = mycursor.fetchall()
             df = DataFrame(output, columns=['States'])
@@ -206,6 +229,7 @@ def searchStudent():
             filterChoice = input("State you would like to see: ")
             mycursor.execute('SELECT * FROM Student WHERE State = ?', (filterChoice,))
             output = mycursor.fetchall()
+            # check if input valid
             if output == []:
                 print("Invalid Input. Please Try Again.")
                 searchStudent()
@@ -222,6 +246,7 @@ def searchStudent():
             filterChoice = input("Faculty Advisor you would like to see: ")
             mycursor.execute('SELECT * FROM Student WHERE FacultyAdvisor = ?', (filterChoice,))
             output = mycursor.fetchall()
+            # check if input valid
             if output == []:
                 print("Invalid Input. Please Try Again.")
                 searchStudent()
