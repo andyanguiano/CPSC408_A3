@@ -1,4 +1,5 @@
 #Andy Anguiano
+#This program has all the helper functions for contacting the database nad giving options
 
 import sqlite3
 import pandas as pd
