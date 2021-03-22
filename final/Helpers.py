@@ -11,7 +11,6 @@ mycursor = conn.cursor()
 
 #preferences when using pandas dataframes
 pd.set_option("display.max_rows", None, "display.max_columns", None, "display.width", None)
-
 #getting data from csv and populating table
 def dataIngestion():
     with open("students.csv") as inputFile:
@@ -22,8 +21,12 @@ def dataIngestion():
                 title += 1
                 continue
             else:
-                mycursor.execute('INSERT INTO Student(FirstName,LastName,Address,City,State,ZipCode,MobilePhoneNumber,Major,GPA) VALUES(?,?,?,?,?,?,?,?,?)',line.split(","))
+                #adding unique key
+                fillings = line.split(",")
+                fillings.append(title)
+                mycursor.execute('INSERT INTO Student(FirstName,LastName,Address,City,State,ZipCode,MobilePhoneNumber,Major,GPA,StudentID) VALUES(?,?,?,?,?,?,?,?,?,?)',fillings)
                 conn.commit()
+                fillings.clear()
                 title += 1
 
 #main options for the program
@@ -103,7 +106,7 @@ def addStudent():
         except ValueError:
             print("Try again with only digits: ")
     #fix this
-    mycursor.execute('INSERT INTO Student VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', (111,nFirstName,nLastName,nGPA,nMajor,nFacultyAdvisor,nAddress,nCity,nState,nZipCode,nPhoneNumber,0))
+    mycursor.execute('INSERT INTO Student(StudentID,FirstName,LastName,GPA,Major,FacultyAdvisor,Address,City,State,ZipCode,MobilePhoneNumber,isDeleted) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', (101,nFirstName,nLastName,nGPA,nMajor,nFacultyAdvisor,nAddress,nCity,nState,nZipCode,nPhoneNumber,0))
     conn.commit()
     print("Student Successfully Added.")
 
