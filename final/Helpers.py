@@ -109,7 +109,7 @@ def addStudent():
 #update a students information
 def updateStudent():
     nSID = input("ID of the student you would like to update: ")
-    mycursor.excecute('SELECT * FROM Student WHERE StudentID = ?', (nSID))
+    mycursor.execute('SELECT * FROM Student WHERE StudentID = ?', (nSID,))
     output = mycursor.fetchall()
     #checking if input is valid
     if output == []:
@@ -150,7 +150,7 @@ def updateStudent():
 #delete a student
 def deleteStudent():
     nSID = input("ID of the student to delete: ")
-    mycursor.execute('SELECT * FROM Student WHERE StudentID = ?', (nSID))
+    mycursor.execute('SELECT * FROM Student WHERE StudentID = ?', (nSID,))
     output = mycursor.fetchall()
     #check if input valid
     if output == []:
